@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스페인어 말하기 수행평가</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #e0e0e0;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-left: 5px solid #667eea;
+            position: relative;
+        }
+
+        .question-text {
+            font-size: 1.8em;
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .countdown-timer {
+            font-size: 4em;
+            color: #ff6b6b;
+            font-weight: bold;
+            text-align: center;
+            margin: 30px 0;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .countdown-timer.show {
+            display: block;
+        }
+
+        .listening-indicator {
+            text-align: center;
+            font-size: 1.2em;
+            color: #667eea;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .listening-indicator.show {
+            display: block;
+        }
+
+        .speaker-icon {
+            font-size: 3em;
+            animation: soundWave 1s infinite;
+        }
+
+        @keyframes soundWave {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .answer-section {
+            background: #e8f5e9;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #27ae60;
+            display: none;
+        }
+
+        .answer-section.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .answer-text {
+            font-size: 1.3em;
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .answer-korean {
+            font-size: 1em;
+            color: #5a6c57;
+            font-style: italic;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-answer {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            font-size: 1.3em;
+            padding: 20px 50px;
+        }
+
+        .btn-show {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .result-badge {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .result-success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .result-fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .completion-message {
+            text-align: center;
+            display: none;
+        }
+
+        .completion-message.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .completion-message h2 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .completion-message p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .score-display {
+            font-size: 2em;
+            color: #27ae60;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .emoji {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .instructions {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            color: #856404;
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 스페인어 말하기 수행평가</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill">0/8</div>
+        </div>
+
+        <div id="startScreen" class="start-screen">
+            <div class="emoji">🎯</div>
+            <h2>준비되셨나요?</h2>
+            <div class="instructions">
+                <h3>📋 수행평가 방법</h3>
+                <ul>
+                    <li>질문이 음성으로 읽혀집니다</li>
+                    <li>음성이 끝나면 5초 카운트다운이 시작됩니다</li>
+                    <li>5초 안에 "답변하기" 버튼을 클릭하세요</li>
+                    <li>성공하면 답을 볼 수 있고, 실패하면 바로 답이 표시됩니다</li>
+                    <li>총 8개의 문제가 출제됩니다</li>
+                </ul>
+            </div>
+            <button class="btn-next" onclick="startQuiz()">시작하기</button>
+        </div>
+
+        <div id="quizScreen" style="display: none;">
+            <div class="question-card">
+                <div class="listening-indicator" id="listeningIndicator">
+                    <div class="speaker-icon">🔊</div>
+                    <div>질문을 읽고 있습니다...</div>
+                </div>
+                <div class="question-text" id="questionText"></div>
+                <div class="countdown-timer" id="countdownTimer">5</div>
+            </div>
+
+            <div id="resultBadge"></div>
+
+            <div class="answer-section" id="answerSection">
+                <div class="answer-text" id="answerText"></div>
+                <div class="answer-korean" id="answerKorean"></div>
+            </div>
+
+            <div class="button-container">
+                <button class="btn-answer" id="answerBtn" onclick="handleAnswer()" disabled>답변하기</button>
+                <button class="btn-show" id="showBtn" onclick="showAnswerAndNext()" style="display: none;">답 보기</button>
+                <button class="btn-next" id="nextBtn" onclick="nextQuestion()" style="display: none;">다음 문제</button>
+            </div>
+        </div>
+
+        <div id="completionScreen" class="completion-message">
+            <div class="emoji">🎉</div>
+            <h2>완료!</h2>
+            <p>8개의 질문을 모두 마쳤습니다!</p>
+            <div class="score-display" id="scoreDisplay"></div>
+            <button class="btn-restart" onclick="restartQuiz()">다시 시작하기</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "¿A qué hora vas a la escuela?",
+                a: "Voy a la escuela a las ocho y media de la mañana.",
+                aKr: "(나는 아침 8시 30분에 학교에 간다.)"
+            },
+            {
+                q: "¿A qué hora te levantas?",
+                a: "Me levanto a las siete de la mañana.",
+                aKr: "(나는 아침 7시에 일어난다.)"
+            },
+            {
+                q: "¿A qué hora te acuestas?",
+                a: "Me acuesto a las once de la noche.",
+                aKr: "(나는 밤 11시에 잔다.)"
+            },
+            {
+                q: "¿A qué hora desayunas?",
+                a: "Desayuno a las siete y media de la mañana.",
+                aKr: "(나는 아침 7시 30분에 아침을 먹는다.)"
+            },
+            {
+                q: "¿A qué hora comes?",
+                a: "Como a la una de la tarde.",
+                aKr: "(나는 오후 1시에 점심을 먹는다.)"
+            },
+            {
+                q: "¿A qué hora cenas?",
+                a: "Ceno a las siete de la tarde.",
+                aKr: "(나는 오후 7시에 저녁을 먹는다.)"
+            },
+            {
+                q: "¿A qué hora empieza la clase?",
+                a: "La clase empieza a las nueve de la mañana.",
+                aKr: "(수업은 아침 9시에 시작한다.)"
+            },
+            {
+                q: "¿A qué hora termina la clase?",
+                a: "La clase termina a las cuatro de la tarde.",
+                aKr: "(수업은 오후 4시에 끝난다.)"
+            },
+            {
+                q: "¿A qué hora llegas a la escuela?",
+                a: "Llego a la escuela a las ocho y cuarenta de la mañana.",
+                aKr: "(나는 아침 8시 40분에 학교에 도착한다.)"
+            },
+            {
+                q: "¿Qué fecha es hoy?",
+                a: "Hoy es veinticinco de noviembre de dos mil veinticinco.",
+                aKr: "(오늘은 2025년 11월 25일이다.)"
+            },
+            {
+                q: "¿Qué fecha es ayer?",
+                a: "Ayer fue veinticuatro de noviembre de dos mil veinticinco.",
+                aKr: "(어제는 2025년 11월 24일이었다.)"
+            },
+            {
+                q: "¿Qué fecha es anteayer?",
+                a: "Anteayer fue veintitrés de noviembre de dos mil veinticinco.",
+                aKr: "(그저께는 2025년 11월 23일이었다.)"
+            },
+            {
+                q: "¿Qué fecha es mañana?",
+                a: "Mañana es veintiséis de noviembre de dos mil veinticinco.",
+                aKr: "(내일은 2025년 11월 26일이다.)"
+            },
+            {
+                q: "¿Qué fecha es pasado mañana?",
+                a: "Pasado mañana es veintisiete de noviembre de dos mil veinticinco.",
+                aKr: "(모레는 2025년 11월 27일이다.)"
+            },
+            {
+                q: "¿Qué día de la semana es hoy?",
+                a: "Hoy es martes.",
+                aKr: "(오늘은 화요일이다.)"
+            },
+            {
+                q: "¿Qué día de la semana es ayer?",
+                a: "Ayer fue lunes.",
+                aKr: "(어제는 월요일이었다.)"
+            },
+            {
+                q: "¿Qué día de la semana es anteayer?",
+                a: "Anteayer fue domingo.",
+                aKr: "(그저께는 일요일이었다.)"
+            },
+            {
+                q: "¿Qué día de la semana es mañana?",
+                a: "Mañana es miércoles.",
+                aKr: "(내일은 수요일이다.)"
+            },
+            {
+                q: "¿Qué día de la semana es pasado mañana?",
+                a: "Pasado mañana es jueves.",
+                aKr: "(모레는 목요일이다.)"
+            },
+            {
+                q: "¿En qué mes estamos?",
+                a: "Estamos en noviembre.",
+                aKr: "(우리는 11월에 있다.)"
+            },
+            {
+                q: "¿Cuándo es tu cumpleaños?",
+                a: "Mi cumpleaños es el quince de marzo.",
+                aKr: "(내 생일은 3월 15일이다.)"
+            },
+            {
+                q: "¿Cuándo es el cumpleaños de tu madre?",
+                a: "El cumpleaños de mi madre es el diez de mayo.",
+                aKr: "(우리 어머니의 생일은 5월 10일이다.)"
+            },
+            {
+                q: "¿Cuándo es el cumpleaños de tu padre?",
+                a: "El cumpleaños de mi padre es el veinte de agosto.",
+                aKr: "(우리 아버지의 생일은 8월 20일이다.)"
+            },
+            {
+                q: "¿En qué estación estamos?",
+                a: "Estamos en otoño.",
+                aKr: "(우리는 가을에 있다.)"
+            },
+            {
+                q: "¿Qué estación te gusta?",
+                a: "Me gusta la primavera.",
+                aKr: "(나는 봄을 좋아한다.)"
+            },
+            {
+                q: "¿Qué tiempo hace en primavera?",
+                a: "En primavera hace buen tiempo y llueve a veces.",
+                aKr: "(봄에는 날씨가 좋고 가끔 비가 온다.)"
+            },
+            {
+                q: "¿Qué tiempo hace en verano?",
+                a: "En verano hace mucho calor y hace sol.",
+                aKr: "(여름에는 매우 덥고 햇빛이 난다.)"
+            },
+            {
+                q: "¿Qué tiempo hace en otoño?",
+                a: "En otoño hace fresco y hace viento.",
+                aKr: "(가을에는 시원하고 바람이 분다.)"
+            },
+            {
+                q: "¿Qué tiempo hace en invierno?",
+                a: "En invierno hace mucho frío y nieva.",
+                aKr: "(겨울에는 매우 춥고 눈이 온다.)"
+            },
+            {
+                q: "¿Qué te gusta hacer en primavera y por qué?",
+                a: "Me gusta ir al parque en primavera porque hace buen tiempo y las flores son bonitas.",
+                aKr: "(나는 봄에 공원에 가는 것을 좋아한다. 날씨가 좋고 꽃들이 예쁘기 때문이다.)"
+            },
+            {
+                q: "¿Qué te gusta hacer en verano y por qué?",
+                a: "Me gusta nadar en verano porque hace mucho calor y el agua está fresca.",
+                aKr: "(나는 여름에 수영하는 것을 좋아한다. 매우 덥고 물이 시원하기 때문이다.)"
+            },
+            {
+                q: "¿Qué te gusta hacer en otoño y por qué?",
+                a: "Me gusta leer libros en otoño porque el clima es agradable y es una estación tranquila.",
+                aKr: "(나는 가을에 책 읽는 것을 좋아한다. 날씨가 좋고 조용한 계절이기 때문이다.)"
+            },
+            {
+                q: "¿Qué te gusta hacer en invierno y por qué?",
+                a: "Me gusta tomar chocolate caliente en invierno porque hace mucho frío y me calienta.",
+                aKr: "(나는 겨울에 핫초코 마시는 것을 좋아한다. 매우 춥고 나를 따뜻하게 해주기 때문이다.)"
+            },
+            {
+                q: "¿Qué te gusta hacer en tu tiempo libre y con qué frecuencia lo haces?",
+                a: "Me gusta jugar al fútbol en mi tiempo libre y lo hago tres veces por semana.",
+                aKr: "(나는 여가 시간에 축구하는 것을 좋아하고 일주일에 세 번 한다.)"
+            },
+            {
+                q: "¿Qué te gusta hacer en tu tiempo libre y por qué?",
+                a: "Me gusta escuchar música en mi tiempo libre porque me relaja y me hace feliz.",
+                aKr: "(나는 여가 시간에 음악 듣는 것을 좋아한다. 나를 편안하게 하고 행복하게 해주기 때문이다.)"
+            },
+            {
+                q: "¿Qué odias hacer y por qué?",
+                a: "Odio limpiar mi habitación porque es aburrido y me quita mucho tiempo.",
+                aKr: "(나는 방 청소하는 것을 싫어한다. 지루하고 시간이 많이 걸리기 때문이다.)"
+            },
+            {
+                q: "¿Qué te encanta hacer y por qué?",
+                a: "Me encanta jugar videojuegos porque son divertidos y puedo jugar con mis amigos.",
+                aKr: "(나는 비디오 게임하는 것을 정말 좋아한다. 재미있고 친구들과 함께 할 수 있기 때문이다.)"
+            },
+            {
+                q: "¿Qué les gusta hacer a tus padres en su tiempo libre y por qué?",
+                a: "A mis padres les gusta ver películas en su tiempo libre porque pueden descansar y relajarse juntos.",
+                aKr: "(우리 부모님은 여가 시간에 영화 보는 것을 좋아하신다. 함께 쉬고 편안해질 수 있기 때문이다.)"
+            },
+            {
+                q: "¿Qué no les gusta hacer a tus padres en su tiempo libre y por qué?",
+                a: "A mis padres no les gusta trabajar en su tiempo libre porque ya trabajan mucho durante la semana.",
+                aKr: "(우리 부모님은 여가 시간에 일하는 것을 싫어하신다. 평일에 이미 많이 일하시기 때문이다.)"
+            },
+            {
+                q: "¿Qué animal te gusta y por qué?",
+                a: "Me gustan los perros porque son leales y cariñosos.",
+                aKr: "(나는 개를 좋아한다. 충성스럽고 다정하기 때문이다.)"
+            },
+            {
+                q: "¿Qué animal no te gusta y por qué?",
+                a: "No me gustan las arañas porque me dan miedo y son desagradables.",
+                aKr: "(나는 거미를 싫어한다. 무섭고 불쾌하기 때문이다.)"
+            },
+            {
+                q: "¿Qué películas te gustan y por qué?",
+                a: "Me gustan las películas de acción porque son emocionantes y entretenidas.",
+                aKr: "(나는 액션 영화를 좋아한다. 흥미진진하고 재미있기 때문이다.)"
+            },
+            {
+                q: "¿Qué películas no te gustan y por qué?",
+                a: "No me gustan las películas de terror porque son muy asustadoras y no puedo dormir después.",
+                aKr: "(나는 공포 영화를 싫어한다. 너무 무섭고 나중에 잠을 잘 수 없기 때문이다.)"
+            },
+            {
+                q: "¿Qué películas te gustan y con qué frecuencia vas al cine?",
+                a: "Me gustan las películas de comedia y voy al cine una vez al mes.",
+                aKr: "(나는 코미디 영화를 좋아하고 한 달에 한 번 영화관에 간다.)"
+            },
+            {
+                q: "¿Qué lugar te gusta y por qué?",
+                a: "Me gusta la biblioteca porque es tranquila y puedo estudiar bien.",
+                aKr: "(나는 도서관을 좋아한다. 조용하고 공부를 잘할 수 있기 때문이다.)"
+            },
+            {
+                q: "¿Qué lugar no te gusta y por qué?",
+                a: "No me gusta el hospital porque es triste y huele mal.",
+                aKr: "(나는 병원을 싫어한다. 슬프고 냄새가 나쁘기 때문이다.)"
+            },
+            {
+                q: "¿Qué lugar te gusta y con qué frecuencia vas?",
+                a: "Me gusta la cafetería y voy dos veces por semana.",
+                aKr: "(나는 카페를 좋아하고 일주일에 두 번 간다.)"
+            },
+            {
+                q: "¿Qué deporte te gusta y por qué?",
+                a: "Me gusta el fútbol porque es un deporte de equipo y es muy dinámico.",
+                aKr: "(나는 축구를 좋아한다. 팀 스포츠이고 매우 역동적이기 때문이다.)"
+            },
+            {
+                q: "¿Qué deporte no te gusta y por qué?",
+                a: "No me gusta el golf porque es muy lento y aburrido.",
+                aKr: "(나는 골프를 싫어한다. 매우 느리고 지루하기 때문이다.)"
+            },
+            {
+                q: "¿Qué deporte te gusta y con qué frecuencia juegas o ves el juego?",
+                a: "Me gusta el baloncesto y juego dos veces por semana y veo los juegos todos los fines de semana.",
+                aKr: "(나는 농구를 좋아하고 일주일에 두 번 하고 주말마다 경기를 본다.)"
+            }
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
+        let answeredCount = 0;
+        let successCount = 0;
+        let countdownInterval = null;
+        let isCountingDown = false;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function startQuiz() {
+            currentQuestions = shuffleArray(questions).slice(0, 8);
+            currentIndex = 0;
+            answeredCount = 0;
+            successCount = 0;
+            
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            document.getElementById('completionScreen').classList.remove('show');
+            
+            showQuestion();
+        }
+
+        function speakQuestion(text) {
+            return new Promise((resolve) => {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Get available voices
+                const voices = speechSynthesis.getVoices();
+                
+                // Find Spanish voice - prioritize es-ES (Spain Spanish) or es-MX (Mexican Spanish)
+                const spanishVoice = voices.find(voice => 
+                    voice.lang.startsWith('es-ES') || 
+                    voice.lang.startsWith('es-MX') || 
+                    voice.lang.startsWith('es')
+                );
+                
+                if (spanishVoice) {
+                    utterance.voice = spanishVoice;
+                }
+                
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.85; // Slightly slower for clarity
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                utterance.onend = () => {
+                    resolve();
+                };
+                
+                utterance.onerror = (error) => {
+                    console.error('Speech error:', error);
+                    resolve();
+                };
+                
+                // Small delay to ensure voice is loaded
+                setTimeout(() => {
+                    speechSynthesis.speak(utterance);
+                }, 100);
+            });
+        }
+
+        // Load voices when they become available
+        function loadVoices() {
+            return new Promise((resolve) => {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    resolve(voices);
+                } else {
+                    speechSynthesis.onvoiceschanged = () => {
+                        resolve(speechSynthesis.getVoices());
+                    };
+                }
+            });
+        }
+
+        // Initialize voices on page load
+        window.addEventListener('load', () => {
+            loadVoices().then(voices => {
+                const spanishVoices = voices.filter(v => v.lang.startsWith('es'));
+                console.log('Available Spanish voices:', spanishVoices.map(v => v.name + ' (' + v.lang + ')'));
+            });
+        });
+
+        async function showQuestion() {
+            const question = currentQuestions[currentIndex];
+            
+            // Reset UI
+            document.getElementById('questionText').textContent = question.q;
+            document.getElementById('answerText').textContent = question.a;
+            document.getElementById('answerKorean').textContent = question.aKr;
+            
+            document.getElementById('answerSection').classList.remove('show');
+            document.getElementById('answerBtn').style.display = 'inline-block';
+            document.getElementById('answerBtn').disabled = true;
+            document.getElementById('showBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('resultBadge').innerHTML = '';
+            document.getElementById('countdownTimer').classList.remove('show');
+            document.getElementById('listeningIndicator').classList.add('show');
+            
+            isCountingDown = false;
+            
+            updateProgress();
+            
+            // Speak the question
+            await speakQuestion(question.q);
+            
+            // Hide listening indicator
+            document.getElementById('listeningIndicator').classList.remove('show');
+            
+            // Start countdown
+            startCountdown();
+        }
+
+        function startCountdown() {
+            let count = 5;
+            isCountingDown = true;
+            
+            const timerElement = document.getElementById('countdownTimer');
+            const answerBtn = document.getElementById('answerBtn');
+            
+            timerElement.textContent = count;
+            timerElement.classList.add('show');
+            answerBtn.disabled = false;
+            
+            countdownInterval = setInterval(() => {
+                count--;
+                timerElement.textContent = count;
+                
+                if (count <= 0) {
+                    clearInterval(countdownInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleAnswer() {
+            if (!isCountingDown) return;
+            
+            clearInterval(countdownInterval);
+            isCountingDown = false;
+            
+            document.getElementById('countdownTimer').classList.remove('show');
+            document.getElementById('answerBtn').style.display = 'none';
+            document.getElementById('showBtn').style.display = 'inline-block';
+            
+            successCount++;
+            
+            document.getElementById('resultBadge').innerHTML = 
+                '<div class="result-badge result-success">✅ 성공! 5초 안에 클릭했습니다!</div>';
+        }
+
+        function handleTimeout() {
+            isCountingDown = false;
+            
+            document.getElementById('countdownTimer').classList.remove('show');
+            document.getElementById('answerBtn').style.display = 'none';
+            document.getElementById('answerBtn').disabled = true;
+            
+            document.getElementById('resultBadge').innerHTML = 
+                '<div class="result-badge result-fail">❌ 시간 초과! 5초 안에 클릭하지 못했습니다.</div>';
+            
+            // Show answer immediately
+            document.getElementById('answerSection').classList.add('show');
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function showAnswerAndNext() {
+            document.getElementById('answerSection').classList.add('show');
+            document.getElementById('showBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            answeredCount++;
+            currentIndex++;
+            
+            if (currentIndex >= 8) {
+                showCompletion();
+            } else {
+                showQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const percentage = (answeredCount / 8) * 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressFill').textContent = answeredCount + '/8';
+        }
+
+        function showCompletion() {
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('completionScreen').classList.add('show');
+            
+            const percentage = 100;
+            document.getElementById('progressFill').style.width = percentage + '%';
+            document.getElementById('progressFill').textContent = '8/8';
+            
+            document.getElementById('scoreDisplay').textContent = 
+                `성공: ${successCount}/8 (${Math.round(successCount/8*100)}%)`;
+        }
+
+        function restartQuiz() {
+            document.getElementById('completionScreen').classList.remove('show');
+            document.getElementById('startScreen').style.display = 'block';
+            
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = '0%';
+            progressFill.textContent = '0/8';
+        }
+    </script>
+</body>
+</html>
